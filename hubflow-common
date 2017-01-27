@@ -175,36 +175,37 @@ git_is_branch_merged_into() {
 
 # check if this repo has been inited for hubflow
 hubflow_has_master_configured() {
-	local master=$(git config --get hubflow.branch.master)
+	local master=$(git config --get hubflow.branch."$FLAGS_pre"master)
 	[ "$master" != "" ] && git_local_branch_exists "$master"
 }
 
 hubflow_has_develop_configured() {
-	local develop=$(git config --get hubflow.branch.develop)
+	local develop=$(git config --get hubflow.branch."$FLAGS_pre"develop)
 	[ "$develop" != "" ] && git_local_branch_exists "$develop"
 }
 
 hubflow_has_prefixes_configured() {
-	git config --get hubflow.prefix.feature >/dev/null 2>&1     && \
-	git config --get hubflow.prefix.release >/dev/null 2>&1     && \
-	git config --get hubflow.prefix.hotfix >/dev/null 2>&1      && \
-	git config --get hubflow.prefix.support >/dev/null 2>&1     && \
-	git config --get hubflow.prefix.versiontag >/dev/null 2>&1
+	git config --get hubflow.prefix."$FLAGS_pre"feature >/dev/null 2>&1     && \
+	git config --get hubflow.prefix."$FLAGS_pre"release >/dev/null 2>&1     && \
+	git config --get hubflow.prefix."$FLAGS_pre"hotfix >/dev/null 2>&1      && \
+	git config --get hubflow.prefix."$FLAGS_pre"support >/dev/null 2>&1     && \
+	git config --get hubflow.prefix."$FLAGS_pre"versiontag >/dev/null 2>&1
 }
 
 hubflow_is_initialized() {
 	hubflow_has_master_configured                    && \
 	hubflow_has_develop_configured                   && \
-	[ "$(git config --get hubflow.branch.master)" !=    \
-	  "$(git config --get hubflow.branch.develop)" ] && \
+	[ "$(git config --get hubflow.branch."$FLAGS_pre"master)" !=    \
+	  "$(git config --get hubflow.branch."$FLAGS_pre"develop)" ] && \
 	hubflow_has_prefixes_configured
 }
 
 # loading settings that can be overridden using git config
 hubflow_load_settings() {
+    echo "git config --get hubflow.branch."$FLAGS_pre"master"
 	export DOT_GIT_DIR=$(git rev-parse --git-dir 2>/dev/null)
-	export MASTER_BRANCH=$(git config --get hubflow.branch.master)
-	export DEVELOP_BRANCH=$(git config --get hubflow.branch.develop)
+	export MASTER_BRANCH=$(git config --get hubflow.branch."$FLAGS_pre"master)
+	export DEVELOP_BRANCH=$(git config --get hubflow.branch."$FLAGS_pre"develop)
 	export ORIGIN=$(git config --get hubflow.origin || echo origin)
     export BRANCH=$(git_current_branch)
 }
@@ -299,6 +300,8 @@ hubflow_remote_merge_helper() {
         echo "    git push '$1' '$2'"
         echo
         echo "After you have pushed back to '$1', please retry your HubFlow command"
+        echo
+        echo "take it easy man !!! :) "
         exit 1
     fi
 
